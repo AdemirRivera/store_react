@@ -11,7 +11,5 @@ export const usePrefetchProduct = () => {
     });
   };
 
-  return {
-    preFetchProduct,
-  };
+  return preFetchProduct;
 };
