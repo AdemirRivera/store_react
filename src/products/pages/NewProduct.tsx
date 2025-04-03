@@ -1,4 +1,5 @@
 import { Button, Image, Input, Textarea } from "@nextui-org/react";
+import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
 interface FormInputs {
@@ -10,7 +11,23 @@ interface FormInputs {
 }
 
 export const NewProduct = () => {
-  const { control, handleSubmit } = useForm<FormInputs>({});
+  const [tempImage, setTempImage] = useState("");
+
+  const { control, handleSubmit, watch } = useForm<FormInputs>({
+    defaultValues: {
+      title: "Chaqueta",
+      price: 10.99,
+      description: "lorem ipsum dolor sit amet, consectetur adipiscing elit",
+      category: "men's clothing",
+      image: "https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_.jpg",
+    },
+  });
+
+  const newImage = watch("image");
+
+  useEffect(() => {
+    setTempImage(newImage);
+  }, [newImage]);
 
   const onSubmit: SubmitHandler<FormInputs> = (data) => {
     console.log(data);
@@ -44,7 +61,7 @@ export const NewProduct = () => {
               render={({ field }) => (
                 <Input
                   value={field.value?.toString()}
-                  onChange={field.onChange}
+                  onChange={(ev) => field.onChange(+ev.target.value)}
                   className="mt-2"
                   type="number"
                   label="Precio del producto"
@@ -109,7 +126,7 @@ export const NewProduct = () => {
               height: "600px",
             }}
           >
-            <Image src="https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_.jpg" />
+            <Image src={tempImage} />
           </div>
         </div>
       </form>
