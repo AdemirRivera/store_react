@@ -101,7 +101,7 @@ export const NewProduct = () => {
             />
             <Controller
               control={control}
-              name="description"
+              name="category"
               rules={{ required: true }}
               render={({ field }) => (
                 <select
