@@ -6,6 +6,20 @@ export const useCreateProduct = () => {
 
   const mutation = useMutation({
     mutationFn: productActions.createProduct,
+
+    onMutate: (product) => {
+      console.log("onMutate");
+
+      const optimisticProduct = { id: Math.random(), ...product };
+
+      // optimistically update the cache
+      queryClient.setQueryData<Product[]>(["products", { filterKey: product.category }], (old) => {
+        if (!old) return [optimisticProduct];
+
+        return [...old, optimisticProduct];
+      });
+    },
+
     onSuccess: (product) => {
       // invalidar query por categoria
       // queryClient.invalidateQueries({ queryKey: ["products", product.category] });
