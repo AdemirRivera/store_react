@@ -8,8 +8,6 @@ export const useCreateProduct = () => {
     mutationFn: productActions.createProduct,
 
     onMutate: (product) => {
-      console.log("onMutate");
-
       const optimisticProduct = { id: Math.random(), ...product };
 
       // optimistically update the cache
@@ -38,6 +36,22 @@ export const useCreateProduct = () => {
 
           return old.map((cacheProduct) => {
             return cacheProduct.id === context?.optimisticProduct.id ? product : cacheProduct;
+          });
+        }
+      );
+    },
+
+    onError: (_, variables, context) => {
+      queryClient.removeQueries({ queryKey: ["products", context?.optimisticProduct.id] });
+
+      queryClient.setQueryData<Product[]>(
+        ["products", { filterKey: variables.category }],
+
+        (old) => {
+          if (!old) return [];
+
+          return old.filter((cacheProduct) => {
+            return cacheProduct.id !== context?.optimisticProduct.id;
           });
         }
       );
