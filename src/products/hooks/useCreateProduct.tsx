@@ -18,11 +18,17 @@ export const useCreateProduct = () => {
 
         return [...old, optimisticProduct];
       });
+
+      return {
+        optimisticProduct,
+      };
     },
 
-    onSuccess: (product) => {
+    onSuccess: (product, _, context) => {
       // invalidar query por categoria
       // queryClient.invalidateQueries({ queryKey: ["products", product.category] });
+
+      queryClient.removeQueries({ queryKey: ["products", context?.optimisticProduct.id] });
 
       queryClient.setQueryData<Product[]>(
         ["products", { filterKey: product.category }],
@@ -30,7 +36,9 @@ export const useCreateProduct = () => {
         (old) => {
           if (!old) return [product];
 
-          return [...old, product];
+          return old.map((cacheProduct) => {
+            return cacheProduct.id === context?.optimisticProduct.id ? product : cacheProduct;
+          });
         }
       );
     },
